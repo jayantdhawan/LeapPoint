@@ -22,6 +22,19 @@ using namespace Leap;
 bool bLastFrameProcessed = true;
 Frame oFrame;
 void processThisFrame();
+float axMin, azMin, axMax, azMax, denMin, denMax;
+
+typedef struct {
+	float min;
+	float max;
+} extremes_t;
+
+typedef struct {
+	extremes_t x;
+	extremes_t y;
+	extremes_t z;
+} tracking_region_t;
+
 
 class LPListener_c : public Listener
 {
@@ -89,14 +102,12 @@ void LPListener_c::onServiceDisconnect(const Controller &)
 void processThisFrame()
 {
 	static int iLastHandId = 0;
+	int i;
 
 	cout << "Processing frame..." << endl;
 
 	cout << "ID " << oFrame.id() << " FPS " << oFrame.currentFramesPerSecond() << " valid " << oFrame.isValid()
 		<< endl;
-
-	if (!oFrame.isValid())
-		return;
 
 	HandList oHandList = oFrame.hands();
 
@@ -110,9 +121,36 @@ void processThisFrame()
 		if (!oHand.isValid())
 			return;
 
-		//int iHandId = oHand.id();
+		int iHandId = oHand.id();
 
-		//cout << "No. of fingers " << oHand.fingers().count() << endl;
+		FingerList oFingerList = oHand.fingers();
+		Finger oFinger;
+
+		for (i = 0; i < oFingerList.count(); i++)
+		{
+			oFinger = oFingerList[i];
+			 
+			if (!oFinger.isValid())
+				continue;
+
+			if (oFinger.type() == Finger::TYPE_INDEX)
+			{
+				Vector oDir = oFinger.direction();
+
+				if (((oDir.x > axMin) && (oDir.x < axMax)) &
+					((oDir.z < azMin) && (oDir.z < azMax)))	// z is going to be more negative if within area
+				{
+					cout << "Pointing within area\t";
+				}
+				else
+				{
+					cout << "Pointing outside area\t";
+				}
+				cout << "Vector (x, y, z): (" << oDir.x << ", " << oDir.y
+					<< ", " << oDir.z << ")\n";
+			}
+		}
+
 	}
 
 	//bLastFrameProcessed = true;
@@ -126,6 +164,24 @@ int main(int argc, char *argv[])
 	LPListener_c oListener;
 
 	cout << "LeapPoint\n\n";
+
+	// Specify the tracking region
+	tracking_region_t sObj = {
+		{-5.0, +4.6},	// x.min, x.max
+		{0, 0},			// y.min, y.max
+		{-5.0, -5.0}	// z.min, z.max
+	};
+
+	denMin = sqrt((sObj.x.min * sObj.x.min) + (sObj.z.min * sObj.z.min));
+	denMax = sqrt((sObj.z.max * sObj.z.max) + (sObj.z.max * sObj.z.max));
+
+	axMin = sObj.x.min / denMin;
+	azMin = sObj.z.min / denMin;
+
+	axMax = sObj.x.max / denMax;
+	azMax = sObj.z.max / denMax;
+
+	cout << "Min (" << axMin << ", " << azMin << ")\t Max (" << axMax << ", " << azMax <<")" << endl;
 
 	// New controller object, add a listener
 	pController = new Controller;
