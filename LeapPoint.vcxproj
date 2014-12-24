@@ -46,17 +46,17 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>E:\Projects.NCSU\HCI.LeapMotion\LeapDeveloperKit_2.1.5+22699_win\LeapSDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>E:\Projects.NCSU\HCI.LeapMotion\LeapDeveloperKit_2.2.0+23475_win\LeapSDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>E:\Projects.NCSU\HCI.LeapMotion\LeapDeveloperKit_2.1.5+22699_win\LeapSDK\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>E:\Projects.NCSU\HCI.LeapMotion\LeapDeveloperKit_2.2.0+23475_win\LeapSDK\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;Leapd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /yr "E:\Projects.NCSU\HCI.LeapMotion\LeapDeveloperKit_2.1.5+22699_win\LeapSDK\lib\x86\Leapd.dll" "$(TargetDir)"
-xcopy /yr "E:\Projects.NCSU\HCI.LeapMotion\LeapDeveloperKit_2.1.5+22699_win\LeapSDK\lib\x86\msvcp120d.dll" "$(TargetDir)"
-xcopy /yr "E:\Projects.NCSU\HCI.LeapMotion\LeapDeveloperKit_2.1.5+22699_win\LeapSDK\lib\x86\msvcr120d.dll" "$(TargetDir)"
+      <Command>xcopy /yr "E:\Projects.NCSU\HCI.LeapMotion\LeapDeveloperKit_2.2.0+23475_win\LeapSDK\lib\x86\Leapd.dll" "$(TargetDir)"
+xcopy /yr "E:\Projects.NCSU\HCI.LeapMotion\LeapDeveloperKit_2.2.0+23475_win\LeapSDK\lib\x86\msvcp120d.dll" "$(TargetDir)"
+xcopy /yr "E:\Projects.NCSU\HCI.LeapMotion\LeapDeveloperKit_2.2.0+23475_win\LeapSDK\lib\x86\msvcr120d.dll" "$(TargetDir)"
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
