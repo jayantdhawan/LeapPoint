@@ -1,26 +1,25 @@
-﻿Build started 11/19/2014 1:25:03 PM.
+﻿Build started 12/3/2014 2:44:39 AM.
      1>Project "E:\Projects.NCSU\HCI.LeapMotion\LeapPoint\LeapPoint.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
-         C:\Program Files\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /IE:\Projects.NCSU\HCI.LeapMotion\LeapDeveloperKit_2.1.5+22699_win\LeapSDK\include /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt Main.cpp
+         C:\Program Files\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /IE:\Projects.NCSU\HCI.LeapMotion\LeapDeveloperKit_2.2.0+23475_win\LeapSDK\include /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt Main.cpp
          Main.cpp
-     1>e:\projects.ncsu\hci.leapmotion\leappoint\main.cpp(173): warning C4305: 'initializing' : truncation from 'double' to 'float'
        Link:
-         C:\Program Files\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"E:\Projects.NCSU\HCI.LeapMotion\LeapPoint\Debug\LeapPoint.exe" /INCREMENTAL /NOLOGO /LIBPATH:E:\Projects.NCSU\HCI.LeapMotion\LeapDeveloperKit_2.1.5+22699_win\LeapSDK\lib\x86 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib Leapd.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"E:\Projects.NCSU\HCI.LeapMotion\LeapPoint\Debug\LeapPoint.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"E:\Projects.NCSU\HCI.LeapMotion\LeapPoint\Debug\LeapPoint.lib" /MACHINE:X86 Debug\Main.obj
+         C:\Program Files\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"E:\Projects.NCSU\HCI.LeapMotion\LeapPoint\Debug\LeapPoint.exe" /INCREMENTAL /NOLOGO /LIBPATH:E:\Projects.NCSU\HCI.LeapMotion\LeapDeveloperKit_2.2.0+23475_win\LeapSDK\lib\x86 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib Leapd.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"E:\Projects.NCSU\HCI.LeapMotion\LeapPoint\Debug\LeapPoint.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"E:\Projects.NCSU\HCI.LeapMotion\LeapPoint\Debug\LeapPoint.lib" /MACHINE:X86 Debug\Main.obj
          LeapPoint.vcxproj -> E:\Projects.NCSU\HCI.LeapMotion\LeapPoint\Debug\LeapPoint.exe
        PostBuildEvent:
-         xcopy /yr "E:\Projects.NCSU\HCI.LeapMotion\LeapDeveloperKit_2.1.5+22699_win\LeapSDK\lib\x86\Leapd.dll" "E:\Projects.NCSU\HCI.LeapMotion\LeapPoint\Debug\"
-         xcopy /yr "E:\Projects.NCSU\HCI.LeapMotion\LeapDeveloperKit_2.1.5+22699_win\LeapSDK\lib\x86\msvcp120d.dll" "E:\Projects.NCSU\HCI.LeapMotion\LeapPoint\Debug\"
-         xcopy /yr "E:\Projects.NCSU\HCI.LeapMotion\LeapDeveloperKit_2.1.5+22699_win\LeapSDK\lib\x86\msvcr120d.dll" "E:\Projects.NCSU\HCI.LeapMotion\LeapPoint\Debug\"
+         xcopy /yr "E:\Projects.NCSU\HCI.LeapMotion\LeapDeveloperKit_2.2.0+23475_win\LeapSDK\lib\x86\Leapd.dll" "E:\Projects.NCSU\HCI.LeapMotion\LeapPoint\Debug\"
+         xcopy /yr "E:\Projects.NCSU\HCI.LeapMotion\LeapDeveloperKit_2.2.0+23475_win\LeapSDK\lib\x86\msvcp120d.dll" "E:\Projects.NCSU\HCI.LeapMotion\LeapPoint\Debug\"
+         xcopy /yr "E:\Projects.NCSU\HCI.LeapMotion\LeapDeveloperKit_2.2.0+23475_win\LeapSDK\lib\x86\msvcr120d.dll" "E:\Projects.NCSU\HCI.LeapMotion\LeapPoint\Debug\"
          
          :VCEnd
-         E:\Projects.NCSU\HCI.LeapMotion\LeapDeveloperKit_2.1.5+22699_win\LeapSDK\lib\x86\Leapd.dll
+         E:\Projects.NCSU\HCI.LeapMotion\LeapDeveloperKit_2.2.0+23475_win\LeapSDK\lib\x86\Leapd.dll
          1 File(s) copied
-         E:\Projects.NCSU\HCI.LeapMotion\LeapDeveloperKit_2.1.5+22699_win\LeapSDK\lib\x86\msvcp120d.dll
+         E:\Projects.NCSU\HCI.LeapMotion\LeapDeveloperKit_2.2.0+23475_win\LeapSDK\lib\x86\msvcp120d.dll
          1 File(s) copied
-         E:\Projects.NCSU\HCI.LeapMotion\LeapDeveloperKit_2.1.5+22699_win\LeapSDK\lib\x86\msvcr120d.dll
+         E:\Projects.NCSU\HCI.LeapMotion\LeapDeveloperKit_2.2.0+23475_win\LeapSDK\lib\x86\msvcr120d.dll
          1 File(s) copied
      1>Done Building Project "E:\Projects.NCSU\HCI.LeapMotion\LeapPoint\LeapPoint.vcxproj" (Build target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:01.45
+Time Elapsed 00:00:01.54

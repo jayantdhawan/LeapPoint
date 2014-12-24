@@ -22,7 +22,7 @@ using namespace Leap;
 bool bLastFrameProcessed = true;
 Frame oFrame;
 void processThisFrame();
-float axMin, azMin, axMax, azMax, denMin, denMax;
+float axMin, azMin, axMax, azMax, ayMin, ayMax, denMin, denMax;
 
 typedef struct {
 	float min;
@@ -72,7 +72,7 @@ void LPListener_c::onFrame(const Controller & controller)
 {
 	static int iIgnore = 0;
 
-	if (iIgnore++ < 20)
+	if (iIgnore++ < 100)
 		return;
 	else
 		iIgnore = 0;
@@ -136,14 +136,45 @@ void processThisFrame()
 			if (oFinger.type() == Finger::TYPE_INDEX)
 			{
 				Vector oDir = oFinger.direction();
+				Vector currTipPos = oFinger.tipPosition();
 
-				if (((oDir.x > axMin) && (oDir.x < axMax)) &
+				// Specify the tracking region
+				tracking_region_t sObj = {
+						{ -50, +46 },	// x.min, x.max
+						{ +15, +95 },			// y.min, y.max
+						{ -50, -50 }	// z.min, z.max
+				};
+
+				//sObj.x.min -= currTipPos.x;
+				//sObj.x.max += currTipPos.x;
+				sObj.y.min -= currTipPos.y;
+				sObj.y.max -= currTipPos.y;
+				//sObj.z.min -= currTipPos.z;
+
+				//cout << "Tip Position: " << currTipPos.x << ", " << currTipPos.y << ", " << currTipPos.z << endl;
+				//cout << "New values: y min " << sObj.y.min << " y max " << sObj.y.max << endl;
+
+				denMin = sqrt((sObj.x.min * sObj.x.min) + (sObj.z.min * sObj.z.min));
+				denMax = sqrt((sObj.x.max * sObj.x.max) + (sObj.z.max * sObj.z.max));
+
+				axMin = sObj.x.min / denMin;
+				//ayMin = sObj.y.min / denMin;
+				azMin = sObj.z.min / denMin;
+
+				axMax = sObj.x.max / denMax;
+				//ayMax = sObj.y.max / denMax;
+				azMax = sObj.z.max / denMax;
+
+				cout << "OA Min (" << axMin << ", " << ", " << ayMin << ", " << azMin << ")\n Max (" 
+					<< axMax << ", " << ", " << ayMax << ", "<< azMax << ")" << endl;
+
+				if (((oDir.x > axMin) && (oDir.x < axMax)) &&
 					((oDir.z < azMin) && (oDir.z < azMax)))	// z is going to be more negative if within area
 				{
 					cout << "Pointing within area\t";
 				}
 				else
-				{
+				{                        
 					cout << "Pointing outside area\t";
 				}
 				cout << "Vector (x, y, z): (" << oDir.x << ", " << oDir.y
@@ -165,23 +196,8 @@ int main(int argc, char *argv[])
 
 	cout << "LeapPoint\n\n";
 
-	// Specify the tracking region
-	tracking_region_t sObj = {
-		{-5.0, +4.6},	// x.min, x.max
-		{0, 0},			// y.min, y.max
-		{-5.0, -5.0}	// z.min, z.max
-	};
 
-	denMin = sqrt((sObj.x.min * sObj.x.min) + (sObj.z.min * sObj.z.min));
-	denMax = sqrt((sObj.z.max * sObj.z.max) + (sObj.z.max * sObj.z.max));
-
-	axMin = sObj.x.min / denMin;
-	azMin = sObj.z.min / denMin;
-
-	axMax = sObj.x.max / denMax;
-	azMax = sObj.z.max / denMax;
-
-	cout << "Min (" << axMin << ", " << azMin << ")\t Max (" << axMax << ", " << azMax <<")" << endl;
+	//cout << "Min (" << axMin << ", " << azMin << ")\t Max (" << axMax << ", " << azMax <<")" << endl;
 
 	// New controller object, add a listener
 	pController = new Controller;
