@@ -22,6 +22,21 @@ using namespace Leap;
 bool bLastFrameProcessed = true;
 Frame oFrame;
 void processThisFrame();
+void processThisFrame_Tool();
+void processThisFrame_Hand_Tool();
+float axMin, azMin, axMax, azMax, ayMin, ayMax, denMin, denMax;
+
+typedef struct {
+	float min;
+	float max;
+} extremes_t;
+
+typedef struct {
+	extremes_t x;
+	extremes_t y;
+	extremes_t z;
+} tracking_region_t;
+
 
 class LPListener_c : public Listener
 {
@@ -59,7 +74,7 @@ void LPListener_c::onFrame(const Controller & controller)
 {
 	static int iIgnore = 0;
 
-	if (iIgnore++ < 20)
+	if (iIgnore++ < 100)
 		return;
 	else
 		iIgnore = 0;
@@ -72,7 +87,7 @@ void LPListener_c::onFrame(const Controller & controller)
 		oFrame = controller.frame(0);
 		//bLastFrameProcessed = false;
 		if (oFrame.isValid())
-			processThisFrame();
+			processThisFrame_Hand_Tool();
 	}
 }
 
@@ -88,15 +103,13 @@ void LPListener_c::onServiceDisconnect(const Controller &)
 
 void processThisFrame()
 {
-	static int iLastHandId = 0;
+	//static int iLastHandId = 0;
+	int i;
 
 	cout << "Processing frame..." << endl;
 
 	cout << "ID " << oFrame.id() << " FPS " << oFrame.currentFramesPerSecond() << " valid " << oFrame.isValid()
 		<< endl;
-
-	if (!oFrame.isValid())
-		return;
 
 	HandList oHandList = oFrame.hands();
 
@@ -112,7 +125,200 @@ void processThisFrame()
 
 		//int iHandId = oHand.id();
 
-		//cout << "No. of fingers " << oHand.fingers().count() << endl;
+		FingerList oFingerList = oHand.fingers();
+		Finger oFinger;
+
+		for (i = 0; i < oFingerList.count(); i++)
+		{
+			oFinger = oFingerList[i];
+			 
+			if (!oFinger.isValid())
+				continue;
+
+			if (oFinger.type() == Finger::TYPE_INDEX)
+			{
+				Vector oDir = oFinger.direction();
+				Vector currTipPos = oFinger.tipPosition();
+
+				// Specify the tracking region
+				tracking_region_t sObj = {
+						{ -50, +46 },	// x.min, x.max
+						{ +15, +95 },			// y.min, y.max
+						{ -50, -50 }	// z.min, z.max
+				};
+
+				//sObj.x.min -= currTipPos.x;
+				//sObj.x.max += currTipPos.x;
+				sObj.y.min -= currTipPos.y;
+				sObj.y.max -= currTipPos.y;
+				//sObj.z.min -= currTipPos.z;
+
+				//cout << "Tip Position: " << currTipPos.x << ", " << currTipPos.y << ", " << currTipPos.z << endl;
+				//cout << "New values: y min " << sObj.y.min << " y max " << sObj.y.max << endl;
+
+				denMin = sqrt((sObj.x.min * sObj.x.min) + (sObj.z.min * sObj.z.min));
+				denMax = sqrt((sObj.x.max * sObj.x.max) + (sObj.z.max * sObj.z.max));
+
+				axMin = sObj.x.min / denMin;
+				//ayMin = sObj.y.min / denMin;
+				azMin = sObj.z.min / denMin;
+
+				axMax = sObj.x.max / denMax;
+				//ayMax = sObj.y.max / denMax;
+				azMax = sObj.z.max / denMax;
+
+				cout << "OA Min (" << axMin << ", " << ", " << ayMin << ", " << azMin << ")\n Max (" 
+					<< axMax << ", " << ", " << ayMax << ", "<< azMax << ")" << endl;
+
+				if (((oDir.x > axMin) && (oDir.x < axMax)) &&
+					((oDir.z < azMin) && (oDir.z < azMax)))	// z is going to be more negative if within area
+				{
+					cout << "Pointing within area\t";
+				}
+				else
+				{                        
+					cout << "Pointing outside area\t";
+				}
+				cout << "Vector (x, y, z): (" << oDir.x << ", " << oDir.y
+					<< ", " << oDir.z << ")\n";
+			}
+		}
+
+	}
+
+	//bLastFrameProcessed = true;
+}
+
+void processThisFrame_Hand_Tool()
+{
+	//static int iLastHandId = 0;
+	int i;
+	Vector tipPosFinger(0, 0, 0), tipPosTool(0, 0, 0);
+	
+	cout << "Processing frame..." << endl;
+
+	cout << "ID " << oFrame.id() << " FPS " << oFrame.currentFramesPerSecond() << " valid " << oFrame.isValid()
+		<< endl;
+
+	// 
+	// Get the finger tip's position first
+	//
+	
+	HandList oHandList = oFrame.hands();
+	
+	cout << "Number of hands " << oHandList.count();
+	
+	if (oHandList.count() == 1) {	
+		Hand oHand = oHandList[0];
+
+		if (!oHand.isValid())
+			return;
+
+		FingerList oFingerList = oHand.fingers();
+
+		for (i = 0; i < oFingerList.count(); i++) {
+			Finger oFinger = oFingerList[i];
+			 
+			if (!oFinger.isValid())
+				continue;
+
+			if (oFinger.type() == Finger::TYPE_INDEX) {
+				tipPosFinger = oFinger.tipPosition();
+			}
+		}
+	}
+	else
+		return;
+
+	// 
+	// Now the tool's tip's position
+	//	
+	
+	ToolList oToolList = oFrame.tools();
+	
+	cout << " Number of tools " << oToolList.count() << endl;
+
+	if (oToolList.count() == 1)
+	{	
+		Tool oTool = oToolList[0];
+
+		if (!oTool.isValid())
+			return;
+
+		//int iHandId = oHand.id();
+
+		tipPosTool = oTool.tipPosition();
+	}
+	else
+		return;
+	
+	cout << "Tool " << tipPosTool.x << " Finger " << tipPosFinger.x << endl;
+	
+	if (tipPosTool.x - tipPosFinger.x < 50)
+		cout << "Within proximity" << endl;
+	else
+		cout << "Outside proximity" << endl;
+
+
+}
+
+void processThisFrame_Tool()
+{
+	ToolList oToolList = oFrame.tools();
+
+	if (oToolList.count() == 1)
+	{	
+		Tool oTool = oToolList[0];
+
+		if (!oTool.isValid())
+			return;
+
+		//int iHandId = oHand.id();
+
+		Vector oDir = oTool.direction();
+		Vector currTipPos = oTool.tipPosition();
+
+		// Specify the tracking region
+		tracking_region_t sObj = {
+				{ -50, +46 },	// x.min, x.max
+				{ +15, +95 },			// y.min, y.max
+				{ -50, -50 }	// z.min, z.max
+		};
+
+		//sObj.x.min -= currTipPos.x;
+		//sObj.x.max += currTipPos.x;
+		sObj.y.min -= currTipPos.y;
+		sObj.y.max -= currTipPos.y;
+		//sObj.z.min -= currTipPos.z;
+
+		//cout << "Tip Position: " << currTipPos.x << ", " << currTipPos.y << ", " << currTipPos.z << endl;
+		//cout << "New values: y min " << sObj.y.min << " y max " << sObj.y.max << endl;
+
+		denMin = sqrt((sObj.x.min * sObj.x.min) + (sObj.z.min * sObj.z.min));
+		denMax = sqrt((sObj.x.max * sObj.x.max) + (sObj.z.max * sObj.z.max));
+
+		axMin = sObj.x.min / denMin;
+		//ayMin = sObj.y.min / denMin;
+		azMin = sObj.z.min / denMin;
+
+		axMax = sObj.x.max / denMax;
+		//ayMax = sObj.y.max / denMax;
+		azMax = sObj.z.max / denMax;
+
+		cout << "OA Min (" << axMin << ", " << ", " << ayMin << ", " << azMin << ")\n Max (" 
+			<< axMax << ", " << ", " << ayMax << ", "<< azMax << ")" << endl;
+
+		if (((oDir.x > axMin) && (oDir.x < axMax)) &&
+			((oDir.z < azMin) && (oDir.z < azMax)))	// z is going to be more negative if within area
+		{
+			cout << "Pointing within area\t";
+		}
+		else
+		{                        
+			cout << "Pointing outside area\t";
+		}
+		cout << "Vector (x, y, z): (" << oDir.x << ", " << oDir.y
+			<< ", " << oDir.z << ")\n";
 	}
 
 	//bLastFrameProcessed = true;
@@ -126,6 +332,9 @@ int main(int argc, char *argv[])
 	LPListener_c oListener;
 
 	cout << "LeapPoint\n\n";
+
+
+	//cout << "Min (" << axMin << ", " << azMin << ")\t Max (" << axMax << ", " << azMax <<")" << endl;
 
 	// New controller object, add a listener
 	pController = new Controller;
@@ -153,4 +362,3 @@ int main(int argc, char *argv[])
 
 	return 0;
 }
-
