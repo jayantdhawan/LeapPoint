@@ -79,15 +79,20 @@ void LPListener_c::onFrame(const Controller & controller)
 	else
 		iIgnore = 0;
 
-	cout << "Got a frame\n";
+	cout << endl;
+	//cout << "Got a frame\n";
 
 	//if (bLastFrameProcessed == true)
 	{
 		// Get the most recent frame
 		oFrame = controller.frame(0);
+
 		//bLastFrameProcessed = false;
 		if (oFrame.isValid())
 			processThisFrame_Hand_Tool();
+		else {
+			cout << "Number of hands 0 Number of tools 0";
+		}
 	}
 }
 
@@ -189,85 +194,12 @@ void processThisFrame()
 	//bLastFrameProcessed = true;
 }
 
-void processThisFrame_Hand_Tool()
-{
-	//static int iLastHandId = 0;
-	int i;
-	Vector tipPosFinger(0, 0, 0), tipPosTool(0, 0, 0);
-	
-	cout << "Processing frame..." << endl;
-
-	cout << "ID " << oFrame.id() << " FPS " << oFrame.currentFramesPerSecond() << " valid " << oFrame.isValid()
-		<< endl;
-
-	// 
-	// Get the finger tip's position first
-	//
-	
-	HandList oHandList = oFrame.hands();
-	
-	cout << "Number of hands " << oHandList.count();
-	
-	if (oHandList.count() == 1) {	
-		Hand oHand = oHandList[0];
-
-		if (!oHand.isValid())
-			return;
-
-		FingerList oFingerList = oHand.fingers();
-
-		for (i = 0; i < oFingerList.count(); i++) {
-			Finger oFinger = oFingerList[i];
-			 
-			if (!oFinger.isValid())
-				continue;
-
-			if (oFinger.type() == Finger::TYPE_INDEX) {
-				tipPosFinger = oFinger.tipPosition();
-			}
-		}
-	}
-	else
-		return;
-
-	// 
-	// Now the tool's tip's position
-	//	
-	
-	ToolList oToolList = oFrame.tools();
-	
-	cout << " Number of tools " << oToolList.count() << endl;
-
-	if (oToolList.count() == 1)
-	{	
-		Tool oTool = oToolList[0];
-
-		if (!oTool.isValid())
-			return;
-
-		//int iHandId = oHand.id();
-
-		tipPosTool = oTool.tipPosition();
-	}
-	else
-		return;
-	
-	cout << "Tool " << tipPosTool.x << " Finger " << tipPosFinger.x << endl;
-	
-	if (tipPosTool.x - tipPosFinger.x < 50)
-		cout << "Within proximity" << endl;
-	else
-		cout << "Outside proximity" << endl;
-
-
-}
-
 void processThisFrame_Tool()
 {
 	ToolList oToolList = oFrame.tools();
 
 	if (oToolList.count() == 1)
-	{	
+	{
 		Tool oTool = oToolList[0];
 
 		if (!oTool.isValid())
@@ -314,7 +246,7 @@ void processThisFrame_Tool()
 			cout << "Pointing within area\t";
 		}
 		else
-		{                        
+		{
 			cout << "Pointing outside area\t";
 		}
 		cout << "Vector (x, y, z): (" << oDir.x << ", " << oDir.y
@@ -322,6 +254,123 @@ void processThisFrame_Tool()
 	}
 
 	//bLastFrameProcessed = true;
+}
+
+void processThisFrame_Hand_Tool()
+{
+	//static int iLastHandId = 0;
+	int i;
+	Vector tipPosFinger(0, 0, 0), tipPosTool(0, 0, 0);
+	Vector tipDirFinger(0, 0, 0), tipDirTool(0, 0, 0);
+	float t1x, t1y, t1z, d1x, d1y, d1z;
+	float t2x, t2y, t2z, d2x, d2y, d2z;
+	
+	cout << "Processing frame..." << endl;
+
+	cout << "ID " << oFrame.id() << " FPS " << oFrame.currentFramesPerSecond() << " valid " << oFrame.isValid()
+		<< endl;
+
+	// 
+	// Get the finger tip's position first
+	//
+	
+	HandList oHandList = oFrame.hands();
+	ToolList oToolList = oFrame.tools();
+	
+	cout << "Number of hands " << oHandList.count();
+	cout << " Number of tools " << oToolList.count() << endl;
+	
+	if (oHandList.count() == 1) {	
+		Hand oHand = oHandList[0];
+
+		if (!oHand.isValid())
+			return;
+
+		FingerList oFingerList = oHand.fingers();
+
+		for (i = 0; i < oFingerList.count(); i++) {
+			Finger oFinger = oFingerList[i];
+			 
+			if (!oFinger.isValid())
+				continue;
+
+			if (oFinger.type() == Finger::TYPE_INDEX) {
+				tipPosFinger = oFinger.tipPosition();
+				t1x = tipPosFinger.x;
+				t1y = tipPosFinger.y;
+				t1z = tipPosFinger.z;
+
+				tipDirFinger = oFinger.direction();
+				d1x = tipDirFinger.x;
+				d1y = tipDirFinger.y;
+				d1z = tipDirFinger.z;
+			}
+		}
+	}
+	else
+		return;
+
+	// 
+	// Now the tool's tip's position
+	//	
+
+	if (oToolList.count() == 1)
+	{
+		Tool oTool = oToolList[0];
+
+		if (!oTool.isValid())
+			return;
+
+		//int iHandId = oHand.id();
+
+		tipPosTool = oTool.tipPosition();
+		t2x = tipPosTool.x;
+		t2y = tipPosTool.y;
+		t2z = tipPosTool.z;
+
+		tipDirTool = oTool.direction();
+		d2x = tipDirTool.x;
+		d2y = tipDirTool.y;
+		d2z = tipDirTool.z;
+	}
+	else
+		return;
+	
+	cout << "Tool " << tipPosTool.x << " Finger " << tipPosFinger.x << endl;
+	
+	
+	// From www2.washjeff.edu/users/mwoltermann/Dorrie/69.pdf
+	
+	// Get the angle between the two lines (using their unit vectors)
+	float mag_dot_prod = d1x*d2x + d1y*d2y + d1z*d2z;
+	float cosine_w = (mag_dot_prod < 0) ? -(mag_dot_prod) : (mag_dot_prod);
+	cout << "Cosine of angle: " << cosine_w << endl;
+	
+	// Get the vector from the tip of the finger to the tip of the tool, to determine 'vector d'
+	float Dx = t2x - t1x;
+	float Dy = t2y - t1y;
+	float Dz = t2z - t1z;
+	
+	// Get the D.(cross-product of the unit direction vectors)
+	float k = (Dx * (d1y*d2z - d1z*d2y) +
+				Dy  * (d1z*d2x - d1x*d2z) +
+				Dz * (d1x*d2y - d1y*d2x)) / 
+				sqrt(1 - (cosine_w*cosine_w));
+		
+	cout << "Minimum distance: " << k << endl;
+
+	if (k < 20 && k > -20)
+		cout << "Pointing at the finger" << endl;
+	else
+		cout << "Pointing elsewhere" << endl;
+		
+/*
+	if (tipPosTool.x - tipPosFinger.x < 50)
+		cout << "Within proximity" << endl;
+	else
+		cout << "Outside proximity" << endl;
+*/
+
 }
 
 int main(int argc, char *argv[])
