@@ -1,7 +1,7 @@
 OS := $(shell uname)
 ARCH := $(shell uname -m)
 
-LEAP_SDK := ../LeapDeveloperKit_2.2.4+26750_linux/LeapSDK
+LEAP_SDK := ../LeapDeveloperKit_2.2.5+26752_linux/LeapSDK
 
 ifeq ($(OS), Linux)
   ifeq ($(ARCH), x86_64)
